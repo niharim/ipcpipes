@@ -1,0 +1,120 @@
+ALGORITHM:
+Pipe1
+
+
+	•	Start
+	•	Initialize variables pipefds and buf.
+	•	Create a pipe using pipe() system call with pipefds as argument.
+	•	Write some data into the pipe
+	•	Read the data from the pipe.
+	•	Stop
+
+
+
+
+
+Pipe2
+
+
+	•	Start
+	•	Initialize variables pipefds, pid and buf.
+	•	Create a pipe using pipe() system call with pipefds as argument.
+	•	Using memset(), fill values of buf array from 0 to 30.
+	•	Using fork(), create a child process.
+	•	Parent process closes the read end and then writes in the write end.
+	•	After writing, parent process closes the write end.
+	•	Parent process waits for the child.
+	•	Child process closes the write end and reads from the pipe through the read end until the pipe is empty.
+	•	After reading, the child process closes the read end.
+	•	Stop
+
+
+
+
+Pipe3
+
+
+	•	Start
+	•	Initialize variables pipefds, pid and buf.
+	•	Create a pipe using pipe() system call with pipefds as argument.
+	•	Using memset(), fill values of buf array from 0 to 30.
+	•	Using fork(), create a child process.
+	•	Parent process closes the read end and then writes in the write end.
+	•	After writing, parent process closes the write end.
+	•	Parent process waits for the child.
+	•	Child process reads from the pipe through the read end until the pipe is empty. Child does not close the write end.
+	•	After reading, the child process closes the read end.
+	•	Stop
+
+
+CODE:
+/* pipe1.c */ #include <stdio.h> #include
+<stdlib.h> #include
+<unistd.h>
+int main(int argc, char* argv[])
+{
+int pipefds[2]; char buf[30];
+//create pipe
+if (pipe(pipefds) == -
+	•	{ perror("pipe"); exit(EXIT_FAILURE)
+;
+}
+//write to pipe
+printf("writing to file descriptor #%d\n", pipefds[1]); write(pipefds[1], "CSCI3150", 9);
+//read from pipe
+printf("reading from file descriptor #%d\n", pipefds[0]); read(pipefds[0], buf, 9); printf("read \"%s\"\n",
+buf); return 0;
+}
+
+/* pipe2.c */ #include <stdio.h> #include
+<stdlib.h> #include
+<unistd.h> #include
+<string.h>
+int main(int argc, char* argv[])
+{
+int pipefds[2]; pid_t pid; char buf[30];
+//create pipe if(pipe(pipefds) == - 1){
+perror("pipe"); exit(EXIT_FAILUR E);
+}
+memset(buf,0,30)
+; pid = fork();
+if (pid > 0) {
+printf(" PARENT write in pipe\n");
+//parent close the read end close(pipefds[0]);
+//parent write in the pipe write end write(pipefds[1], "CSCI3150", 9);
+//after finishing writing, parent close the write end close(pipefds[1]);
+//parent wait for child wait(NULL);
+}else {
+//child close the write end close(pipefds[1]); // --line *
+//child read from the pipe read end until the pipe is empty while(read(pipefds[0], buf, 1)==1) printf("CHILD read from pipe -- %s\n", buf);
+//after finishing reading, child close the read end close(pipefds[0]);
+printf("CHILD:EXITING!");
+ exit(EXIT_SUCCESS);}
+return 0;
+}
+
+/* pipe3.c */ #include <stdio.h> #include
+<stdlib.h> #include
+<unistd.h> #include
+<string.h>
+int main(int argc, char* argv[])
+{
+int pipefds[2]; pid_t pid; char buf[30];
+//create pipe if(pipe(pipefds) == - 1){
+perror("pipe"); exit(EXIT_FAILUR E);
+}
+memset(buf,0,30)
+; pid = fork();
+if (pid > 0) {
+printf(" PARENT write in pipe\n");
+//parent close the read end close(pipefds[0]);
+//parent write in the pipe write end write(pipefds[1], "CSCI3150", 9);
+//after finishing writing, parent close the write end close(pipefds[1]);
+//parent wait for child wait(NULL);
+}else {
+//child read from the pipe read end until the pipe is empty while(read(pipefds[0], buf, 1)==1) printf("CHILD read from pipe -- %s\n", buf);
+//after finishing reading, child close the read end close(pipefds[0]);
+printf("CHILD: EXITING!"); exit(EXIT_SUCCESS);
+}
+return 0;
+}
